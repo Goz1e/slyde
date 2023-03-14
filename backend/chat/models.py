@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from django.contrib import messages
 import uuid, string, random
 # Create your models here.
@@ -20,31 +20,27 @@ class Message(models.Model):
 
 class Room(models.Model):
     name = models.CharField(max_length=50)
-    room_id = models.CharField(unique=True,editable=False,max_length=4)
+    room_id = models.CharField(unique=True,max_length=4,blank=True,null=False)
     created_on = models.DateTimeField(auto_now_add=True)
     private = models.BooleanField(default=False)
-    members = models.ManyToManyField(User, related_name='memberships')
-    room_admin = models.ManyToManyField(User,)
+    members = models.ManyToManyField(User, related_name='memberships', blank=True)
+    requests = models.ManyToManyField(User, related_name='requests', blank=True)
+    room_admin = models.ManyToManyField(User, blank=True, related_name='administrations')
     owner = models.ForeignKey(
-        User,on_delete=models.CASCADE,
+        User,on_delete=models.CASCADE, blank=True,
         related_name='my_rooms',related_query_name='my_rooms'
     )
     messages = models.ManyToManyField(
-        Message,related_name='room', related_query_name='room'
+        Message,related_name='room', related_query_name='room',
+        blank=True
     )
 
     class Meta:
-        permissions = [
-            ('del_room','dg can delete room'),
-            ('edit_room','dg can edit message'),
-            ('access_room','dg access edit message'),
-            ('make_admin','dg can make admin'),
-            ('remove_member','dg can remove member'),
-            ('dg_requests','dg can manage requests'),
-        ]
+        ordering =['name']
     
     def save(self,*args,**kwargs):
-        self.room_id = Room.random_uuid()
+        if self.room_id == '':
+            self.room_id = Room.random_uuid()
         return super().save(*args,**kwargs)
 
     @classmethod
@@ -74,18 +70,45 @@ class Room(models.Model):
             user in self.room_admin.all()
         )
     
+    def admit_user(self,user):
+        if not self.is_member(user):
+            if user in self.requests.all():
+                return 'request pending'
+            self.requests.add(user)
+            return 'private room!, request sent'
+        return True
+    
+    def approve_requests(self,admin,user):
+        if admin.has_perm('change_room',self):
+            self.members.add(user)
+            return True
+        return False    
+    
+    def decline_requests(self,admin,user):
+        if admin.has_perm('change_room',self):
+            self.requests.remove(user)
+            return True
+        return False    
+
+    def remove_member(self,admin,user):
+        if admin.has_perm('change_room',self):
+            print(f'{admin.username} has permission to remove member')
+            self.members.remove(user)
+            return True
+        return False
+    
     def make_admin(self,owner,member):
-        if owner.has_perm('make_admin',self):
+        if self.is_owner(user=owner):
             room_admins = Group.objects.get(name = 'room admins')
             print('user has perm MAKE ADMIN')
             if self.is_member(user=member):
                 member.groups.add(room_admins)
                 self.room_admin.add(member)
-            return True
+                return True
         return False
     
     def revoke_admin(self,owner,admin):
-        if owner.has_perm('make_admin',self):
+        if self.is_owner(user=owner):
            room_admins = Group.objects.get(name = 'room admins')
            room_admins.user_set.remove(admin)
            self.room_admin.remove(admin)
@@ -93,16 +116,4 @@ class Room(models.Model):
         return False
             
         
-    def add_member(self,admin,user):
-        if admin.has_perm('edit_room',self):
-            print(f'{admin.username} has permission to add member')
-            self.members.add(user)
-            return True
-        return False    
-
-    def remove_member(self,admin,user):
-        if admin.has_perm('edit_room',self):
-            print(f'{admin.username} has permission to remove member')
-            self.members.remove(user)
-            return True
-        return False
+    

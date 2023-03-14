@@ -1,5 +1,3 @@
-create member permissions group
-create all_user_rooms queryset (owned rooms and memberships)
+// create skeleton views and work on frontend
+// work on async 
 
-create skeleton views and work on frontend
-work on async 

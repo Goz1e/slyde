@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 # Register your models here.
@@ -13,3 +14,4 @@ class RoomAdmin(GuardedModelAdmin):
     # date_hierarchy = 'created_at'
 
 admin.site.register(Room, GuardedModelAdmin)
+admin.site.register(Permission)
