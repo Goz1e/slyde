@@ -1,4 +1,5 @@
 {% extends 'account/base.html' %}
+{% load crispy_forms_tags %}
 {% load static %}
 {% block stylesheet %}
 <link href="{% static 'chat/dashboard.css' %}" rel="stylesheet">
@@ -6,237 +7,96 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-        <div class="position-sticky sidebar-sticky  pb-5 mb-5">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">
-                <span data-feather="home" class="align-text-bottom"></span>
-                Rooms--
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file" class="align-text-bottom"></span>
-                Orders
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="shopping-cart" class="align-text-bottom"></span>
-                Products
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">
-                <span data-feather="home" class="align-text-bottom"></span>
-                Rooms
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file" class="align-text-bottom"></span>
-                Orders
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="shopping-cart" class="align-text-bottom"></span>
-                Products
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">
-                <span data-feather="home" class="align-text-bottom"></span>
-                Rooms
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file" class="align-text-bottom"></span>
-                Orders
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="shopping-cart" class="align-text-bottom"></span>
-                Products
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">
-                <span data-feather="home" class="align-text-bottom"></span>
-                Rooms
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file" class="align-text-bottom"></span>
-                Orders
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="shopping-cart" class="align-text-bottom"></span>
-                Products
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">
-                <span data-feather="home" class="align-text-bottom"></span>
-                Rooms
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file" class="align-text-bottom"></span>
-                Orders
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="shopping-cart" class="align-text-bottom"></span>
-                Products
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="users" class="align-text-bottom"></span>
-                Customers
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="bar-chart-2" class="align-text-bottom"></span>
-                Reports
-              </a>
-            </li>
-            
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="layers" class="align-text-bottom"></span>
-                Integrations--
-              </a>
-            </li>
-            <br><br><br><br>
-          </ul>
-  
-        </div>
-      </nav>
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky sidebar-sticky  pb-5 mb-5">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">
+                        <span data-feather="home" class="align-text-bottom"></span>
+                        <strong>Rooms: </strong>
+                    </a>
+                </li>
+                {% if rooms %}
+                {% for room in rooms %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'room' room_id=room.room_id %}">
+                        <span data-feather="file" class="align-text-bottom"></span>
+                        {{room.name}}
+                    </a>
+                </li>
+                {% endfor %}
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span data-feather="file" class="align-text-bottom"></span>
+                        <strong>No rooms yet </strong>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <br><br><br><br>
+            </ul>
+    
+            </div>
+        </nav>
   
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-5 my-4 ">
         <!-- contain chat bubble -->
 
             <div class="d-flex flex-row justify-content-start">
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            <div>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Hi</p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">How are you ...???
-                </p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">What are you doing
-                tomorrow? Can we come up a bar?</p>
-                <p class="small ms-3 mb-3 rounded-3 text-muted">23:58</p>
-            </div>
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+                    alt="avatar 1" style="width: 45px; height: 100%;">
+                <div>
+                    <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Hi</p>
+                    <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">welcome to Slyde
+                    </p>
+                    <p class="small p-2 ms-3 mb-1 rounded-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="background-color: #f5f6f7;">
+                        <!-- <a href=""> -->
+                            <strong>click here 👇</strong> to create new room
+                        <!-- </a> -->
+                    </p>
+
+                    <!-- <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        Generate random room
+                    </button> -->
+
+
+                    <p class="small ms-3 mb-3 rounded-3 text-muted">23:58</p>
+                </div>
             </div>
 
             
             <div class="d-flex flex-row justify-content-end mb-4 pt-1">
-            <div>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Hiii, I'm good.</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">How are you doing?</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Long time no see! Tomorrow
-                office. will
-                be free on sunday.</p>
-                <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:06</p>
+                <div>
+                    <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">that's all for now! </p>
+                    <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">the rest of this convo is irrelevent ...</p>
+                    <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">I kn3w you would indulge 😛</p>
+                    <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:06</p>
+                </div>
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
+                    alt="avatar 1" style="width: 45px; height: 100%;">
             </div>
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            </div>
+
             <div class="d-flex flex-row justify-content-start">
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            <div>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Hi</p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">How are you ...???
-                </p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">What are you doing
-                tomorrow? Can we come up a bar?</p>
-                <p class="small ms-3 mb-3 rounded-3 text-muted">23:58</p>
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+                    alt="avatar 1" style="width: 45px; height: 100%;">
+                <div>
+                    <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">now that i have you here!</p>
+                    <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">let me tell you about the light at the end of the tunnel
+                    </p>
+                    <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">many got lost searching for it😵, <strong>bring a torch!🔥</strong></p>
+                    <p class="small ms-3 mb-3 rounded-3 text-muted">23:58</p>
+                </div>
             </div>
-            </div>
-
             
-            <div class="d-flex flex-row justify-content-end mb-4 pt-1">
-            <div>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Hiii, I'm good.</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">How are you doing?</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Long time no see! Tomorrow
-                office. will
-                be free on sunday.</p>
-                <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:06</p>
-            </div>
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            </div>
-            <div class="d-flex flex-row justify-content-start">
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            <div>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Hi</p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">How are you ...???
-                </p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">What are you doing
-                tomorrow? Can we come up a bar?</p>
-                <p class="small ms-3 mb-3 rounded-3 text-muted">23:58</p>
-            </div>
-            </div>
 
-            
-            <div class="d-flex flex-row justify-content-end mb-4 pt-1">
-            <div>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Hiii, I'm good.</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">How are you doing?</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Long time no see! Tomorrow
-                office. will
-                be free on sunday.</p>
-                <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:06</p>
-            </div>
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            </div>
-            <div class="d-flex flex-row justify-content-start">
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            <div>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Hi</p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">How are you ...???
-                </p>
-                <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">What are you doing
-                tomorrow? Can we come up a bar?</p>
-                <p class="small ms-3 mb-3 rounded-3 text-muted">23:58</p>
-            </div>
-            </div>
-
-            
-            <div class="d-flex flex-row justify-content-end mb-4 pt-1">
-            <div>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Hiii, I'm good.</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">How are you doing?</p>
-                <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Long time no see! Tomorrow
-                office. will
-                be free on sunday.</p>
-                <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:06</p>
-            </div>
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
-                alt="avatar 1" style="width: 45px; height: 100%;">
-            </div>
-
-<!-- chat bubble end -->
+    <!-- chat bubble end -->
         </main>
     </div>
-  </div>
-  
+
+</div>
+{% include 'account/create_room_modal.html' %}
+
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'chat/dashboard.js' %}"></script> 

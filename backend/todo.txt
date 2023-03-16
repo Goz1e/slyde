@@ -1,0 +1,22 @@
+// create room link (pop-up page)
+// notiferjs for notification
+// account settins page
+// modify members and request page with bootstrap collapse
+
+// ASYNC 
+// async message delete
+
+// HOST
+
+Room logic : 
+
+Private Room(
+    non-members cannot-view == django view guardian
+    settings page(
+        update form = owner_only
+        make and revoke admin = owner_only
+        manage requests and members = admins and owner
+    )
+)
+
+

@@ -19,39 +19,42 @@
     <div class="cover-container text-center">
       <header class="mb-auto">
         <ul class="nav d-flex-col justify-content-center py-2 mb-3 sticky-top bg-light fixed-top" id="nav"> 
-
+          {% if chat_page %}
           <li class="nav-item nav-item pt-2 ps-2">
             <button class="navbar-toggler d-md-none collapsed p-0" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
               <i class="bi bi-grid" style="font-size: 1rem;"></i>
             </button>
           </li>
+          {% endif %}
           <li class="nav-item">
               <!-- <a class="btn btn-primary" href="#" role="button">Link</a> -->
-            <a class="btn btn-outline" href="#">
-                {% if request.user.is_authenticated %}
+              {% if request.user.is_authenticated %}
+              <a class="btn btn-outline" href="{% url 'dashboard' %}">
                 {{request.user.username}}
                 {% else %}
-                user
-                {% endif %}
+              <a class="btn btn-outline" href="{% url 'index' %}">
+              <i class="bi bi-patch-question-fill"></i>
+              {% endif %}
             </a>
           </li>
           <li class="nav-item w-50">
-              <form class="d-flex" action="#">
-                  <input class="form-control rounded-5" type="search" placeholder="enter room ID">
-                  <!-- <button class="btn btn-outline-success" id="button-addon2" type="submit">Search</button> -->
+              <form class="d-flex" action="{% url 'get_room' %}" method="get">
+                <input class="form-control rounded-5" name="q" type="search" placeholder="enter room ID">
               </form>
           </li>
           
           <li class="nav-item">
             <div class="btn-group dropstart">
                 <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  more
+                  {% if room %}{{room.room_id}}{% else %}more{% endif %}
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="http://127.0.0.1:8000/admin/login/?next=/admin/">admin</a></li>
                     <li><a class="dropdown-item" href="{% url 'logout' %}">logout</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">room settings</a></li>
+                    {% if room %}
+                    <li><a class="dropdown-item" href="{% url 'room_settings' room_id=room.room_id %}">room settings</a></li>
+                    {% endif %}
                   <!-- Dropdown menu links -->
                 </ul>
             </div>
@@ -77,15 +80,27 @@
           {% block content %}
           {% endblock %}
         </main>
-
+        {% if chat_page %}
         <footer class="mt-auto pe-4 px-3 footer bg-light pt-1" id="foot">
           <div class="input-group mb-3">
               <textarea class="form-control" aria-label="With textarea"></textarea>
               <button class="btn btn-outline-secondary" type="button" id="button-addon2">send</button>
           </div>
         </footer>
+        {% else %}
+        <footer class="d-flex flex-wrap justify-content-between bg-light align-items-center py-3 my-4 border-top" id="foot">
+          <div class="col-md-4 d-flex align-items-center">
+            <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+              <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"/></svg>
+            </a>
+            <span class="mb-3 mb-md-0 text-muted">&copy; 2023 Slyde</span>
+          </div>
+        </footer>
+        {% endif %}
+
       </div>
     </div>
+
     {% block scripts %}{# Specific template scripts here #}{% endblock %}
   </body>
 </html>

@@ -2,10 +2,14 @@ from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout 
 from .forms import LoginForm,UserCreationForm
+from chat.forms import CreateRoomForm
 
 # Create your views here.
 def index(request):
-    return render(request,'account/index.html',{'title':'slyde'})
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    form = CreateRoomForm
+    return render(request,'account/index.html',{'title':'slyde','form':form})
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -22,6 +26,7 @@ def login_view(request):
             if user is not None:
                 login(request,user) 
                 messages.success(request,'login successfull')
+                return redirect('dashboard')
             else:
                 messages.success(request,'login failed')
             return redirect('index')
