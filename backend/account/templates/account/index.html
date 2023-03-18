@@ -11,15 +11,14 @@
                 <a class="btn btn-sm btn-outline-dark mx-1" href="{% url 'login' %}" role="button">login</a>
                 <a class="btn btn-sm btn-outline-dark mx-1" href="{% url 'signup' %}" role="button">signup</a>
             </div>
-            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Generate random room
             </button>
         </div>
     </div>
-</main>
-
-<!-- Modal -->
-{% include 'account/create_room_modal.html' %}
+</main> 
+  
+{% include 'account/display_name_modal.html' %}
 
 {% endblock %}
 

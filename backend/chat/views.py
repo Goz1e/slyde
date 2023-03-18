@@ -3,40 +3,31 @@ from .models import *
 from django.contrib import messages
 from .forms import RoomForm, CreateRoomForm
 from guardian.utils import get_anonymous_user
-from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
-from guardian.shortcuts import assign_perm
-# from guardian.shortcuts import assign_perm
-
-# def perm_check(room,user):
-#     return bool(
-#         user.has_perm('chat.super_admin',room)
-#     )
-# super_admins = Group.objects.get(name='super admin')
 
 # Create your views here.
 def create_room(request):
     if request.POST:
         form = CreateRoomForm(request.POST)
         if form.is_valid():
-            room = form.save(commit=False)
-            if request.user.is_authenticated:
-                room.owner = request.user
-                # room.owner.groups.add(super_admins)
-            else:
-                room.owner = get_anonymous_user()
-                # room.allow_anon = True
-                # room.owner.groups.add(super_admins)
             room.save()
-            # assign_perm('super_admin',room.owner,room)
             msg = f'{room.name} created with ID: {room.room_id}'
             return redirect('room',room.room_id)
         msg = 'room creation failed'
         messages.info(request,msg)
         return redirect('index')
 
+def anon_room(request):
+    dp_name = request.GET.get('dp_name')
+    room_name = request.GET.get('room_name')
+    sexxion = request.session
+    sexxion['dp_name'] = dp_name
+    room = Room.objects.create(name = room_name)
+    print(sexxion.__dict__)
+    print(dp_name)
+    return redirect('room',room.room_id)
+
 def dashboard(request):
-    rooms = Room.objects.all_rooms(request.user)
     form = CreateRoomForm(request.POST)
     template_name = 'chat/dashboard.html'
     context = {
@@ -44,8 +35,10 @@ def dashboard(request):
         'chat_page':'chat_page',
         'form':form
     }
-    if rooms.exists():
-        context['rooms']=rooms
+    if request.user.is_authenticated:
+        rooms = Room.objects.all_rooms(request.user)
+        if rooms.exists():
+            context['rooms']=rooms
     return render(request, template_name, context)
 
 def get_room(request):
@@ -62,6 +55,9 @@ def get_room(request):
 
 def room(request,room_id):
     room = get_object_or_404(Room,room_id=room_id)
+    if room.private:
+        messages.info('login to access private rooms!')
+        return redirect('index')
     access = room.admit_user(request.user)
     if access !=True:
         messages.info(request,access)
@@ -69,12 +65,18 @@ def room(request,room_id):
             return redirect('dashboard')
         return redirect('index')
     context = {
-        'room':room, 'title':room.name, 'chat_page':'chat_page'
+        'room':room, 'title':room.name,
+        'chat_page':'chat_page',
     }
+
+    if request.user.is_authenticated:
+        rooms = Room.objects.all_rooms(request.user)
+        context['username'] = request.user.username
+        context['rooms'] = rooms
+        context['auth_user'] = 'auth_user'
     return render(request,'chat/room.html',context)
 
     
-# @user_passes_test(email_check)
 def room_settings(request,room_id):
     room = get_object_or_404(Room,room_id=room_id)
     form = CreateRoomForm(request.POST or None, instance=room)

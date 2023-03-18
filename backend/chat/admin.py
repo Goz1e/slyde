@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 # Register your models here.
-from chat.models import Room
+from chat.models import Room, Message
 
 
 class RoomAdmin(GuardedModelAdmin):
@@ -15,3 +15,4 @@ class RoomAdmin(GuardedModelAdmin):
 
 admin.site.register(Room, GuardedModelAdmin)
 admin.site.register(Permission)
+admin.site.register(Message)

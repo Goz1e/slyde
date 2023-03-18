@@ -3,20 +3,36 @@ from django.contrib.auth.models import User, Group, Permission
 import uuid, string, random
 from django.db.models import Q
 # Create your models here.
-
 class Message(models.Model):
-    author = models.OneToOneField(User,on_delete=models.CASCADE)
+    author = models.ForeignKey(User,related_name='messages', related_query_name='messages', on_delete=models.CASCADE, null=True)
     content = models.TextField(max_length=500)
     timestamp = models.DateTimeField(auto_now_add=True)
+    display_name = models.CharField(max_length=50)
+
+    @property
+    def created_on(self):
+        h = self.timestamp.hour
+        m = self.timestamp.minute
+        x = 'AM'
+        if h > 12:
+            x = 'PM'
+            h -=12
+        return f'{h}:{m} {x}'
+
+    @property
+    def author_name(self):
+        if self.author == None:
+            return str(self.display_name)
+        return str(self.author.username)
+
 
     def __str__(self):
         return f'{self.content[:5]} by {self.author}'
     
-    class Meta:
-        permissions = [
-            ('dg_delete','dg can delete message'),
-        ]
-
+    # class Meta:
+    #     permissions = [
+    #         ('dg_delete','dg can delete message'),
+    #     ]
 
 class RoomQueryset(models.QuerySet):
     def my_rooms(self,user):
@@ -180,3 +196,5 @@ class Room(models.Model):
                 pass
             return True
         return False
+    
+
