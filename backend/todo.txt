@@ -20,3 +20,18 @@ Private Room(
 )
 
 
+Aim : get author from different source, rather than msg.author
+
+how (
+    generate random room view :
+
+    takes room_name and display_name:
+    room is created
+    display_name is stored in session.
+    if user is not authenticated:
+        display_name is used to create message
+)
+
+action (
+    create form and use it to assign display_name
+)

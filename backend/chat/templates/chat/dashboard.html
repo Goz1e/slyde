@@ -40,14 +40,20 @@
             </div>
         </nav>
   
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-5 my-4 ">
-            enter room name 
-            
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-5 my-4 mt-5 ">
+            <p class="lead">Create an instant Room</p>
+            <p class="small"> registered users can create and join private rooms</p> 
+            <p class="small">room admin pridvilages | manage admins if roon owner</p>            
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                create room
+            </button>
+            <br><br><br><br>
+            <p class="small">room name, privacy settings, and admin actions can be changed in room settings</p>            
         </main>
     </div>
 
 </div>
-{% include 'account/create_room_modal.html' %}
+{% include 'chat/create_room_modal.html' %}
 
 {% endblock %}
 {% block scripts %}

@@ -50,7 +50,13 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="http://127.0.0.1:8000/admin/login/?next=/admin/">admin</a></li>
-                    <li><a class="dropdown-item" href="{% url 'logout' %}">logout</a></li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">
+                      {% if request.user.is_authenticated %}
+                      logout
+                      {% else %}
+                      logout session
+                      {% endif %}
+                    </a></li>
                     <li><hr class="dropdown-divider"></li>
                     {% if room %}
                     <li><a class="dropdown-item" href="{% url 'room_settings' room_id=room.room_id %}">room settings</a></li>

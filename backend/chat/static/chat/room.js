@@ -47,6 +47,7 @@ chatSocket.onmessage = function(e) {
     const pText = document.createElement('p')
     const pInfo = document.createElement('p')
     
+    console.log('USER :', user, '\n Mst Author :', author)
     
     if (user === author){
         chatLog.appendChild(outDiv)
@@ -81,8 +82,7 @@ chatSocket.onmessage = function(e) {
         avatar.style.fontSize = '1.5em'
     }
 
-
-    
+    window.scrollTo(0, document.body.scrollHeight);
 };
 
 chatSocket.onopen = function(e){

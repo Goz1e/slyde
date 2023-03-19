@@ -29,11 +29,6 @@ class Message(models.Model):
     def __str__(self):
         return f'{self.content[:5]} by {self.author}'
     
-    # class Meta:
-    #     permissions = [
-    #         ('dg_delete','dg can delete message'),
-    #     ]
-
 class RoomQueryset(models.QuerySet):
     def my_rooms(self,user):
         qs = self.filter(owner=user)
@@ -130,9 +125,10 @@ class Room(models.Model):
     def admit_user(self,user):
         if self.private:
             if self.is_member(user) or self.has_prem_access(user):
-            # if self.is_member(user) or self.has_access(user):
                 return True
-            else:    
+            else:
+                if not user.is_authenticated:
+                    return None    
                 if user in self.requests.all():
                     msg='request pending'
                 else:
@@ -181,7 +177,6 @@ class Room(models.Model):
         return False
     
     def revoke_admin(self,owner,user):
-        print('revoke admin called')
         if self.has_prem_access(owner):
            self.room_admin.remove(user)
            return True

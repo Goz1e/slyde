@@ -2,15 +2,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import *
 from django.contrib import messages
 from .forms import RoomForm, CreateRoomForm
-from guardian.utils import get_anonymous_user
-from django.contrib.auth.models import Group
 
 # Create your views here.
 def create_room(request):
     if request.POST:
         form = CreateRoomForm(request.POST)
         if form.is_valid():
-            room.save()
+            room = form.save()
             msg = f'{room.name} created with ID: {room.room_id}'
             return redirect('room',room.room_id)
         msg = 'room creation failed'
@@ -23,8 +21,6 @@ def anon_room(request):
     sexxion = request.session
     sexxion['dp_name'] = dp_name
     room = Room.objects.create(name = room_name)
-    print(sexxion.__dict__)
-    print(dp_name)
     return redirect('room',room.room_id)
 
 def dashboard(request):
@@ -54,11 +50,11 @@ def get_room(request):
 
 
 def room(request,room_id):
-    room = get_object_or_404(Room,room_id=room_id)
-    if room.private:
+    room = get_object_or_404(Room,room_id = room_id)
+    access = room.admit_user(request.user)
+    if access == None:
         messages.info('login to access private rooms!')
         return redirect('index')
-    access = room.admit_user(request.user)
     if access !=True:
         messages.info(request,access)
         if request.user.is_authenticated:
@@ -74,6 +70,9 @@ def room(request,room_id):
         context['username'] = request.user.username
         context['rooms'] = rooms
         context['auth_user'] = 'auth_user'
+    else:
+        context['username'] = request.session['dp_name']
+
     return render(request,'chat/room.html',context)
 
     
@@ -83,7 +82,6 @@ def room_settings(request,room_id):
     if request.user.is_authenticated:
         form = RoomForm(request.POST or None, instance=room)
     if request.POST:
-        print('request is POST')
         if form.is_valid():
             form.save()
             return redirect('room',room.room_id)

@@ -3,7 +3,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import Message,Room
 from django.shortcuts import get_object_or_404
-import channels.auth
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -15,6 +14,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
         
+
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
@@ -24,17 +24,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         command = text_data_json["command"]
         await self.commands[command](self, text_data_json or None)
     
+    # loads all saved messages on connection
     async def load_messages(self,x):
         room_id = self.scope['url_route']["kwargs"]['room_id']
         msgs = await self.room_msgs_to_list(room_id)
 
+        #for-loop for sending room messaes on chatsocket connection         
         for msg in msgs:
             await self.channel_layer.group_send(
             self.room_group_name, {
             "type": "chat_message", "message": msg['message'],
             'author' : msg['author'], 'timestamp': msg['timestamp']                    
             })
-        
     
     async def new_message(self,text_data_json):
         
@@ -58,6 +59,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
     
+    # command dictionary for calling functions 
     commands = {
         'new_message': new_message,
         'load_messages': load_messages
@@ -74,6 +76,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "message": message, 'author':author, 'timestamp':timestamp
         }))
 
+    # create database msg for authenticated users
     @database_sync_to_async
     def create_msg(self,content,author,room_id):
         room = get_object_or_404(Room,room_id=room_id)
@@ -83,6 +86,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         room.messages.add(msg)
         return msg
     
+    # create database msg for anonymous users
     @database_sync_to_async
     def anon_create_msg(self,content,author_name,room_id):
         room = get_object_or_404(Room,room_id=room_id)
